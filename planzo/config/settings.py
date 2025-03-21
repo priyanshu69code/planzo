@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ofqf!ficam$-i@=sr-*_5dytvom&%_9w!92p8u8k8%a7^@^6$&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["planzo","planzo.com","localhost",]
+ALLOWED_HOSTS = ["planzo","planzo.com","localhost","165.22.219.3"]
 
 
 # Application definition
