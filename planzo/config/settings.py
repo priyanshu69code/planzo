@@ -9,9 +9,8 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,18 +20,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ofqf!ficam$-i@=sr-*_5dytvom&%_9w!92p8u8k8%a7^@^6$&'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get("DEBUG", False))
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+print(ALLOWED_HOSTS)
+print(DEBUG)
+# ALLOWED_HOSTS = ["planzo","planzo.com","localhost",]
 
-ALLOWED_HOSTS = ["planzo","planzo.com","localhost",]
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(",")
 
 
 # Application definition
 CUSTOM_APPS = [
     'user',
     'event',
+    'core',
 ]
 
 
@@ -109,11 +113,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'planzodev1',
-        'USER': 'planzo',
-        'PASSWORD': 'planzo',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'planzodev1'),
+        'USER': os.environ.get('POSTGRES_USER', 'planzo'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'planzo'),
+        'HOST': 'db',
+        'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
 
@@ -170,7 +174,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -199,6 +202,8 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 
-# Media Settings
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = '/static/static/'
+MEDIA_URL = '/static/media/'
+
+MEDIA_ROOT = '/vol/web/media'
+STATIC_ROOT = '/vol/web/static'
