@@ -2,56 +2,106 @@ version: '3.8'
 
 services:
   web:
-    build: .
-    restart: always
-    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: planzo_web
+    restart: unless-stopped
     volumes:
-      - ./:/app
-      - static_volume:/app/planzo/staticfiles
-      - media_volume:/app/planzo/media
+      - static_volume:/home/django/web/staticfiles
+      - media_volume:/home/django/web/mediafiles
+    env_file:
+      - ./.env
     depends_on:
       - db
-      - redis_celery
       - redis_cache
+      - redis_celery
+    networks:
+      - planzo_network
 
   db:
-    image: postgres:13
+    image: postgres:16
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file: .env
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - planzo_network
 
-  redis_celery:  # For Celery tasks
-    image: redis:6
+  redis_celery:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
     volumes:
       - redis_celery_data:/data
-    command: redis-server --requirepass ${CELERY_REDIS_PASSWORD}
+    networks:
+      - planzo_network
 
-  redis_cache:  # For Django caching
-    image: redis:6
+  redis_cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
     volumes:
       - redis_cache_data:/data
-    command: redis-server --requirepass ${CACHE_REDIS_PASSWORD}
+    networks:
+      - planzo_network
 
   celery:
-    build: .
-    restart: always
-    env_file: .env
-    command: celery -A config worker -l info
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: planzo_celery
+    restart: unless-stopped
+    command: celery -A config worker -l info --workdir=./planzo
+    volumes:
+      - ./:/home/django/web/
+    env_file:
+      - ./.env
     depends_on:
+      - web
+      - db
       - redis_celery
+    networks:
+      - planzo_network
 
   nginx:
-    image: nginx:1.21
+    image: nginx:1.25-alpine
+    restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
-      - static_volume:/app/planzo/staticfiles
-      - media_volume:/app/planzo/media
+      - static_volume:/home/django/web/staticfiles
+      - media_volume:/home/django/web/mediafiles
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - web
+    networks:
+      - planzo_network
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  planzo_network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  redis_cache_data:
+  redis_celery_data:
   static_volume:
   media_volume:
-  redis_celery_data:
-  redis_cache_data:
