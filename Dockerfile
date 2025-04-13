@@ -18,6 +18,7 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install pipenv
 
+RUN pipenv install gunicorn
 # Copy Pipfile files
 COPY Pipfile Pipfile.lock /app/
 
