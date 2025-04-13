@@ -12,6 +12,7 @@ djangorestframework-simplejwt = "*"
 pillow = "*"
 djangorestframework = "*"
 django-allauth = "*"
+django-redis = "*"
 
 [dev-packages]
 

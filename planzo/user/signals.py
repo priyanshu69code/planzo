@@ -25,4 +25,4 @@ from .tasks import make_verification_secreate
 @receiver(post_save, sender=User)
 def create_verification_secret(sender, instance, created, **kwargs):
     if created and not instance.verication_secret:
-        make_verification_secreate.delay(instance)
+        make_verification_secreate.delay(instance.id)
