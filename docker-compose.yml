@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    restart: always
+    env_file: .env
+    volumes:
+      - ./:/app
+      - static_volume:/app/planzo/staticfiles
+      - media_volume:/app/planzo/media
+    depends_on:
+      - db
+      - redis_celery
+      - redis_cache
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file: .env
+
+  redis_celery:  # For Celery tasks
+    image: redis:6
+    volumes:
+      - redis_celery_data:/data
+    command: redis-server --requirepass ${CELERY_REDIS_PASSWORD}
+
+  redis_cache:  # For Django caching
+    image: redis:6
+    volumes:
+      - redis_cache_data:/data
+    command: redis-server --requirepass ${CACHE_REDIS_PASSWORD}
+
+  celery:
+    build: .
+    restart: always
+    env_file: .env
+    command: celery -A config worker -l info
+    depends_on:
+      - redis_celery
+
+  nginx:
+    image: nginx:1.21
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - static_volume:/app/planzo/staticfiles
+      - media_volume:/app/planzo/media
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  redis_celery_data:
+  redis_cache_data:
