@@ -12,6 +12,8 @@ then
     echo "PostgreSQL started"
 fi
 
+pipenv shell
+
 # Apply database migrations
 python planzo/manage.py migrate
 

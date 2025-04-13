@@ -18,12 +18,13 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install pipenv
 
-RUN pipenv install gunicorn
 # Copy Pipfile files
 COPY Pipfile Pipfile.lock /app/
 
 # Install dependencies
 RUN pipenv install --deploy --system
+
+RUN pipenv install gunicorn
 
 # Stage 2: Runtime
 FROM python:3.13-slim
