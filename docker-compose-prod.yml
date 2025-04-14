@@ -1,0 +1,68 @@
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - static_data:/vol/web
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  redis_celery:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - redis_celery_data:/data
+    expose:
+      - 6379
+
+  redis_cache:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - redis_cache_data:/data
+    expose:
+      - 6379
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - ./planzo:/planzo
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis_celery
+
+  proxy:
+    build:
+      context: ./proxy
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - 80:8000
+    volumes:
+      - static_data:/vol/static
+
+volumes:
+  postgres_data:
+  redis_celery_data:
+  redis_cache_data:
+  static_data:
+  media_data:
