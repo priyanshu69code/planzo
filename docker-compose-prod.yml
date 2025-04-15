@@ -4,6 +4,7 @@ services:
       context: .
     volumes:
       - static_data:/vol/web
+      - ./planzo:/planzo
     env_file:
       - .env
     environment:

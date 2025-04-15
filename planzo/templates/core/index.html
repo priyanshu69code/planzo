@@ -1,7 +1,70 @@
-{% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Planzo API Index{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>Welcome to My Django Project!</h1>
+<div class="container py-5">
+    <h1 class="mb-4">📘 Planzo API Index</h1>
+
+    <div class="accordion" id="apiAccordion">
+        <!-- User API -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="userApi">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="true" aria-controls="collapseUser">
+                    👤 User API Endpoints
+                </button>
+            </h2>
+            <div id="collapseUser" class="accordion-collapse collapse show" aria-labelledby="userApi" data-bs-parent="#apiAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li><strong>Base URL:</strong> <code>/planzo/v1/user/</code></li>
+                        <li>Includes login, registration, and profile endpoints (add specifics here as per your user app).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event API -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="eventApi">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvent" aria-expanded="false" aria-controls="collapseEvent">
+                    📅 Event API Endpoints
+                </button>
+            </h2>
+            <div id="collapseEvent" class="accordion-collapse collapse" aria-labelledby="eventApi" data-bs-parent="#apiAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li><code>POST /planzo/v1/event/create/</code> - Create a new event (auth required)</li>
+                        <li><code>GET /planzo/v1/event/list/</code> - List all events</li>
+                        <li><code>GET /planzo/v1/event/detail/&lt;int:pk&gt;/</code> - Get event details</li>
+                        <li><code>GET /planzo/v1/event/my-events/</code> - List events hosted by logged-in user</li>
+                        <li><code>PUT /planzo/v1/event/update/&lt;int:pk&gt;/</code> - Update a hosted event</li>
+                        <li><code>POST /planzo/v1/event/image/create/</code> - Upload image for event (auth required)</li>
+                        <li><code>GET /planzo/v1/event/image/detail/&lt;int:pk&gt;/</code> - Retrieve image info</li>
+                        <li><code>GET /planzo/v1/event/image/list/?event_id=&lt;event_id&gt;</code> - List all images for a specific event</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="authApi">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAuth" aria-expanded="false" aria-controls="collapseAuth">
+                    🔐 Authentication Endpoints
+                </button>
+            </h2>
+            <div id="collapseAuth" class="accordion-collapse collapse" aria-labelledby="authApi" data-bs-parent="#apiAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li><code>/api-auth/login/</code> - Login form for session auth (DRF)</li>
+                        <li><code>/api-auth/logout/</code> - Logout user</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 {% endblock %}

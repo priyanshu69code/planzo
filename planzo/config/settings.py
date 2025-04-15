@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
 print(ALLOWED_HOSTS)
 # ALLOWED_HOSTS = ["planzo","planzo.com","localhost",]
@@ -41,6 +41,7 @@ CUSTOM_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'django_bootstrap5',
 ]
 
 # settings.py
@@ -83,7 +84,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
