@@ -17,7 +17,7 @@ RUN python -m venv /py && \
 
 # Copy application code after installing dependencies
 COPY ./planzo /planzo
-COPY ./scripts /scripts
+# COPY ./scripts /scripts
 
 WORKDIR /planzo
 EXPOSE 8000
@@ -29,11 +29,11 @@ RUN addgroup -S app && adduser -S -H -G app app && \
     mkdir -p /vol/web/static && \
     mkdir -p /vol/web/media && \
     chown -R app:app /vol && \
-    chmod -R 775 /vol && \
-    chmod -R +x /scripts
+    chmod -R 775 /vol
+    # chmod -R +x /scripts
 
 # Switch to 'app' user after setting up permissions
-ENV PATH="/scripts:/py/bin:$PATH"
+ENV PATH="/py/bin:$PATH"
 USER app
 
-CMD ["run.sh"]
+# CMD ["run.sh"]
