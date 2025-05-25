@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.gis.db.models import PointField
 
 
 class MyUserManager(BaseUserManager):
@@ -61,3 +62,19 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.email
+
+
+class UserPrefrences(models.Model):
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
+    receive_notifications = models.BooleanField(default=True)
+    receive_emails = models.BooleanField(default=True)
+    receive_sms = models.BooleanField(default=False)
+    eventproximity = models.IntegerField(default=5)  # in kilometers
+    event_type = models.CharField(max_length=100, blank=True)
+    current_location = models.CharField(max_length=100, blank=True)
+    location = PointField(geography=True, blank=True, null=True)
+
+
+
+    def __str__(self):
+        return f"{self.user.email} Preferences"

@@ -27,6 +27,7 @@ urlpatternsv1 = [
 
 
 urlpatterns = [
+    path("", include("core.urls"), name="core"),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
 ] + urlpatternsv1

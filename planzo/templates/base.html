@@ -1,0 +1,29 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en"></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Planzo{% endblock %}</title>
+    {% bootstrap_css %}
+</head>
+<body>
+    <header>
+        {% block header %}
+        <!-- Add your header content here -->
+        {% endblock %}
+    </header>
+    <main>
+        {% block content %}
+        <!-- Main content will go here -->
+        {% endblock %}
+    </main>
+    <footer>
+        {% block footer %}
+        <!-- Add your footer content here -->
+        {% endblock %}
+    </footer>
+    {% bootstrap_javascript %}
+</body>
+</html>

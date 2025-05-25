@@ -1,0 +1,62 @@
+
+services:
+  app:
+    build:
+      context: .
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    volumes:
+      - ./planzo:/planzo
+      - ./data/web:/vol/web
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    env_file:
+      - .env
+
+  redis_celery:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - redis_celery_data:/data
+    expose:
+      - 6379
+
+  redis_cache:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - redis_cache_data:/data
+    expose:
+      - 6379
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - ./planzo:/planzo
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis_celery
+
+volumes:
+  postgres_data:
+  redis_celery_data:
+  redis_cache_data:
+  static_data:
+  media_data:

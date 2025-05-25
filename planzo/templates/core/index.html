@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Planzo API Reference{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Planzo API Documentation</h2>
+
+    <div class="accordion" id="apiSections">
+        <!-- User Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingUser">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUser">
+                    👤 User Endpoints
+                </button>
+            </h2>
+            <div id="collapseUser" class="accordion-collapse collapse" data-bs-parent="#apiSections">
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        {% for ep in user_endpoints %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ ep.name }}</span>
+                            <button class="btn btn-sm btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#endpointModal"
+        data-endpoint-id="us{{ forloop.counter }}">
+    View
+</button>
+<script type="application/json" id="us{{ forloop.counter }}">
+    {{ ep|safe|json_script:"unused" }}
+</script>
+
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingEvent">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvent">
+                    🎉 Event Endpoints
+                </button>
+            </h2>
+            <div id="collapseEvent" class="accordion-collapse collapse" data-bs-parent="#apiSections">
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        {% for ep in event_endpoints %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ ep.name }}</span>
+                            <button class="btn btn-sm btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#endpointModal"
+        data-endpoint-id="ep{{ forloop.counter }}">
+    View
+</button>
+<script type="application/json" id="ep{{ forloop.counter }}">
+    {{ ep|safe|json_script:"unused" }}
+</script>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Endpoint Details -->
+<div class="modal fade" id="endpointModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-white border-0 shadow-lg rounded-4 p-4" style="backdrop-filter: blur(6px);">
+      <div class="modal-header">
+        <h5 class="modal-title" id="endpointTitle">Endpoint Detail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>URL:</strong> <span id="endpointUrl"></span></p>
+        <p><strong>Method:</strong> <span id="endpointMethod" class="badge bg-primary"></span></p>
+        <p><strong>Authentication:</strong> <span id="endpointAuth"></span></p>
+        <p><strong>Request:</strong></p>
+        <pre><code id="endpointRequest" class="bg-light p-2 rounded"></code></pre>
+        <p><strong>Response:</strong></p>
+        <pre><code id="endpointResponse" class="bg-light p-2 rounded"></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('endpointModal');
+        modal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const endpointId = button.getAttribute('data-endpoint-id');
+            // Get the outer script element
+            // const raw = document.getElementById(endpointId);
+
+            // 1. Get the raw JSON string from the script tag
+            let raw = document.getElementById(endpointId).textContent;
+
+            // 2. Remove the outer quotes if present
+            if (raw.startsWith('"') && raw.endsWith('"')) {
+                raw = raw.slice(1, -1);
+            }
+
+            // 3. Replace all single quotes with double quotes
+            // raw = raw.replace(/^<script[^>]*>\s*"/, '').replace(/"$/, '');
+            raw = raw.trim();
+            raw = raw.replace(/^<script[^>]*>\s*"/, '').replace(/"\s*$/, '');
+
+
+            raw = raw.replace(/'/g, '"');
+
+            // 4. Parse the cleaned string to a JavaScript object
+            let data = JSON.parse(raw);
+
+            // Now you can use the data object
+            console.log(data.name); // "Register User"
+
+
+
+            // console.log("JSON string:", jsonString);
+            document.getElementById('endpointTitle').innerText = data.name;
+            document.getElementById('endpointUrl').innerText = data.url;
+            document.getElementById('endpointMethod').innerText = data.method;
+            document.getElementById('endpointAuth').innerText = data.auth;
+            document.getElementById('endpointRequest').innerText = JSON.stringify(data.request, null, 2);
+            document.getElementById('endpointResponse').innerText = JSON.stringify(data.response, null, 2);
+        });
+    });
+    </script>
+
+{% endblock %}
