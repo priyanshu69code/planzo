@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 
 class Event(models.Model):
     name = models.CharField(max_length=100)
@@ -47,6 +48,10 @@ class Event(models.Model):
         if self.capacity == 0:
             return 0
         return self.capacity - self.attendees.count()  # Return the value instead of modifying capacity
+
+    def get_absolute_url(self):
+        return reverse('event:event-detail', kwargs={'pk': self.pk})
+
 
 
 class EventImage(models.Model):
