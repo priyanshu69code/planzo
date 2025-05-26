@@ -3,17 +3,19 @@ LABEL maintainer="https://github.com/priyanshu69code"
 
 ENV PYTHONUNBUFFERED 1
 
-# Copy only requirements.txt first to leverage Docker's caching mechanism
-COPY ./requirements.txt /requirements.txt
-
-# Create a virtual environment and install dependencies
-RUN python -m venv /py && \
+# Install GDAL dependencies and other required packages
+RUN apk update && \
+    apk add --no-cache \
+    postgresql-client \
+    build-base \
+    postgresql-dev \
+    musl-dev \
+    linux-headers \
+    gdal-dev \
+    && python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
-    apk add --update --no-cache postgresql-client && \
-    apk add --update --no-cache --virtual .temp-deps \
-        build-base postgresql-dev musl-dev linux-headers && \
     /py/bin/pip install -r /requirements.txt && \
-    apk del .temp-deps
+    apk del build-base postgresql-dev musl-dev linux-headers gdal-dev
 
 # Copy application code after installing dependencies
 COPY ./planzo /planzo
